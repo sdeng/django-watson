@@ -334,9 +334,7 @@ def escape_mysql_boolean_query(search_text):
     mysql_search_text = u" ".join(word for word in mysql_words)
 
     return u" ".join(
-        u'+{word}*'.format(
-            word = word,
-        )
+        u'+%s*' % word
         for word in escape_mysql_boolean_query_chars(mysql_search_text).split()
     )
     
