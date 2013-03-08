@@ -325,11 +325,19 @@ class PostgresPrefixLegacySearchBackend(RegexSearchMixin, PostgresLegacySearchBa
 escape_mysql_boolean_query_chars = make_escaper(u"+-<>()*\"")
 
 def escape_mysql_boolean_query(search_text):
+    # Removing search terms with less than 4 characters, due to MySQL's default
+    # ft_min_word_len=4 setting for boolean full text indexing.
+    mysql_words = []
+    for word in search_text.split():
+        if len(word) > 3:
+            mysql_words.append(word)
+    mysql_search_text = u" ".join(word for word in mysql_words)
+
     return u" ".join(
         u'+{word}*'.format(
             word = word,
         )
-        for word in escape_mysql_boolean_query_chars(search_text).split()
+        for word in escape_mysql_boolean_query_chars(mysql_search_text).split()
     )
     
 
